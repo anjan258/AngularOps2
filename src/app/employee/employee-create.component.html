@@ -17,7 +17,9 @@
             highlights the control -->
             <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
             [class.is-invalid]="employeeForm.get('fullName').errors  && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >
-
+            
+            {{ fullNameLength }}
+            
             <!-- displays the corresponding error message if any validation errors, and if the control is touched/dirty -->
             <!-- employeeForm.get('fullName').errors?.required -- check if any error and if so check if any required validation failed -->
             <span class="text-danger" *ngIf="employeeForm.get('fullName').errors?.required
