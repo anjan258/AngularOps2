@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 // Validators -- for validations
 // FormBuilder -- for "Angular Formbuilder" - code
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-employee-create',
@@ -39,7 +39,8 @@ export class EmployeeCreateComponent implements OnInit {
       maxlength: 'Full Name must be less than 10 characters.',
     },
     email: {
-      required: 'Email is required.'
+      required: 'Email is required.',
+      emailDomain: 'Email domain should be angular.com.'  // "emailDomain" - the key returing from custom validation
     },
     phone: {
       required: 'Phone is required.',
@@ -90,7 +91,7 @@ export class EmployeeCreateComponent implements OnInit {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactpreference: ['email'],
-      email: ['', Validators.required],
+      email: ['', [Validators.required, validatEmailDomain]], // custom validation -- "validatEmailDomain"
       phone: [''],
       skills: this.fb.group({
         skillName: ['', Validators.required],
@@ -118,10 +119,9 @@ export class EmployeeCreateComponent implements OnInit {
     //   console.log(JSON.stringify(value));
     // });
 
-  // to track the changes of "ContactPreference" - radio button instead ow writing click event in template
-  // we write as follows
-    this.employeeForm.get('contactpreference').valueChanges.subscribe((data: string) =>
-    {
+    // to track the changes of "ContactPreference" - radio button instead ow writing click event in template
+    // we write as follows
+    this.employeeForm.get('contactpreference').valueChanges.subscribe((data: string) => {
       this.onContactPreferenceChange(data);
     });
   }
@@ -159,7 +159,7 @@ export class EmployeeCreateComponent implements OnInit {
   // and then assign the respective error message to the "formsError" -- name by matching the control name
   // for an example, if we have a required field validation for FullName, we get the error message from "validationMessages" --array
   // and then assign message to teh fullName varaible in "formsError"  -- array
-  logValidationErrors(grp: FormGroup =  this.employeeForm): void {
+  logValidationErrors(grp: FormGroup = this.employeeForm): void {
     Object.keys(grp.controls).forEach((key: string) => {
 
       const abstractControl = grp.get(key);
@@ -220,16 +220,30 @@ export class EmployeeCreateComponent implements OnInit {
   }
 
   // on change to contact preference, we are dynamically adding validations
-  onContactPreferenceChange(selectedVal: string): void{
+  onContactPreferenceChange(selectedVal: string): void {
     const phoneControl = this.employeeForm.get('phone'); // to get phone control
     if (selectedVal === 'phone') {
       phoneControl.setValidators([Validators.required, Validators.maxLength(10)]); // setting validation dynamically
     }
-    else{
+    else {
       phoneControl.clearValidators(); // clear validations
     }
 
     phoneControl.updateValueAndValidity(); // to update the dynamically set/clear validations
   }
-
 }
+
+  // custom validation function to validate email domain
+  // if domain matches retun null or error and so the return type is -- { [key: string]: any } | null
+function validatEmailDomain(control: AbstractControl): { [key: string]: any } | null {
+
+    const email: string = control.value;
+    const domain = email.substring(email.lastIndexOf('@') + 1);
+    // email === '' || so that email required error message doesnot show on domain validation
+    if (email === '' || domain.toLocaleLowerCase() === 'angular.com') {
+      return null;
+    }
+    else {
+      return { emailDomain: true }; // returning some string and true to indicate that the validation failed
+    }
+  }
