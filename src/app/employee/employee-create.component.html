@@ -15,25 +15,63 @@
             
             <!-- employeeForm.get('fullName').errors -- checks if any validatio error on this controls and if so
             highlights the control -->
+            <!-- validations in view template -->
+            <!-- <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
+            [class.is-invalid]="employeeForm.get('fullName').errors  && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" > -->
+
+            <!-- validations from component model -->
             <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
-            [class.is-invalid]="employeeForm.get('fullName').errors  && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >
+             (blur)="logValidationErrors()">
             
             {{ fullNameLength }}
             
             <!-- displays the corresponding error message if any validation errors, and if the control is touched/dirty -->
             <!-- employeeForm.get('fullName').errors?.required -- check if any error and if so check if any required validation failed -->
-            <span class="text-danger" *ngIf="employeeForm.get('fullName').errors?.required
+            <!-- displaying errors in view template -->
+            <!-- <span class="text-danger" *ngIf="employeeForm.get('fullName').errors?.required
             && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >Full Name is required</span>
-
             <span class="text-danger" *ngIf="(employeeForm.get('fullName').hasError('maxlength') || employeeForm.get('fullName').hasError('minlength'))
-            && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >Full Name must be greater than 2 characters and than 10 characters.</span>
+            && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >Full Name must be greater than 2 characters and than 10 characters.</span> -->
+
+                <!-- displaying errors from component-->
+            <span class="text-danger" *ngIf="formErrors.fullName"> {{ formErrors.fullName }} </span>
+          </div>
+        </div>
+
+
+          <!-- we can remove (click)="onContactPreferenceChange('email')" from the template view
+          and add in the component because it will be complex to unit test.
+          We can do so in component by subscribinh the changes whenever this control is changes.
+          like --  this.empployeeform.get('contactpreference').valueChanges.subscribe()-->
+        <div class="form-group">
+          <label class="col-md-2 control-label">Contact Preference</label>
+          <div class="col-md-8" style="display: inline-flex;">
+            <label class="radio-inline">
+              <input type="radio" value="email" formControlName="contactpreference" (click)="onContactPreferenceChange('email')">Email
+            </label> &nbsp;&nbsp;
+            <label class="radio-inline">
+              <input  type="radio" value="phone" formControlName="contactpreference" (click)="onContactPreferenceChange('phone')">Phone
+            </label>&nbsp;&nbsp;
           </div>
         </div>
   
         <div class="form-group">
           <label class="col-sm-2 control-label" for="email">Email</label>
           <div class="col-sm-8">
-            <input id="email" type="text" class="form-control" formControlName="email" placeholder="Email" >
+            <input id="email" type="text" class="form-control" formControlName="email" placeholder="Email"
+            (blur)="logValidationErrors()">
+
+            <span class="text-danger" *ngIf="formErrors.email"> {{ formErrors.email }} </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label" for="phone">Phone</label>
+          <div class="col-sm-8">
+            <input id="phone" type="text" class="form-control" formControlName="phone" placeholder="Phone"
+            (blur)="logValidationErrors()">
+
+            <span class="text-danger" *ngIf="formErrors.phone"> {{ formErrors.phone }} </span>
           </div>
         </div>
 
@@ -47,7 +85,7 @@
             </label>
             <div class="col-sm-6" style="display: inline-flex;">
               <input type="text" class="form-control" id="skillName"
-                  placeholder="Name" formControlName="skillName"> &nbsp;&nbsp;
+                  placeholder="c#,java,angular,mvc,.." formControlName="skillName"> &nbsp;&nbsp;
 
                   <input type="text" placeholder="Experience in Years"
                   class="form-control" formControlName="experienceInYears">
