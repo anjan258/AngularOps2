@@ -1,126 +1,139 @@
-
 <!-- [formGroup]="employeeForm" -- indicates the form group -->
 <!-- formControlName="fullName", formControlName="email" -- form control names specified the component -->
 <!-- "formControlName" -- form control directive which maps to formc ontrols from component -->
 
 <form [formGroup]="employeeForm" class="form-horizontal" (ngSubmit)="onFormSubmit()">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Create Employee</h3>
-      </div>
-      <div class="panel-body">
-        <div class="form-group">
-          <label class="col-sm-2 control-label" for="fullName" >Full Name</label>
-          <div class="col-sm-8">
-            
-            <!-- employeeForm.get('fullName').errors -- checks if any validatio error on this controls and if so
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Create Employee</h3>
+    </div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="fullName">Full Name</label>
+        <div class="col-sm-8">
+
+          <!-- employeeForm.get('fullName').errors -- checks if any validatio error on this controls and if so
             highlights the control -->
-            <!-- validations in view template -->
-            <!-- <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
+          <!-- validations in view template -->
+          <!-- <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
             [class.is-invalid]="employeeForm.get('fullName').errors  && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" > -->
 
-            <!-- validations from component model -->
-            <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
-             (blur)="logValidationErrors()">
-            
-            {{ fullNameLength }}
-            
-            <!-- displays the corresponding error message if any validation errors, and if the control is touched/dirty -->
-            <!-- employeeForm.get('fullName').errors?.required -- check if any error and if so check if any required validation failed -->
-            <!-- displaying errors in view template -->
-            <!-- <span class="text-danger" *ngIf="employeeForm.get('fullName').errors?.required
+          <!-- validations from component model -->
+          <input id="fullName" type="text" class="form-control" formControlName="fullName" placeholder="Full Name"
+            (blur)="logValidationErrors()">
+
+          {{ fullNameLength }}
+
+          <!-- displays the corresponding error message if any validation errors, and if the control is touched/dirty -->
+          <!-- employeeForm.get('fullName').errors?.required -- check if any error and if so check if any required validation failed -->
+          <!-- displaying errors in view template -->
+          <!-- <span class="text-danger" *ngIf="employeeForm.get('fullName').errors?.required
             && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >Full Name is required</span>
             <span class="text-danger" *ngIf="(employeeForm.get('fullName').hasError('maxlength') || employeeForm.get('fullName').hasError('minlength'))
             && (employeeForm.get('fullName').touched || employeeForm.get('fullName').dirty)" >Full Name must be greater than 2 characters and than 10 characters.</span> -->
 
-                <!-- displaying errors from component-->
-            <span class="text-danger" *ngIf="formErrors.fullName"> {{ formErrors.fullName }} </span>
-          </div>
+          <!-- displaying errors from component-->
+          <span class="text-danger" *ngIf="formErrors.fullName"> {{ formErrors.fullName }} </span>
         </div>
+      </div>
 
 
-          <!-- we can remove (click)="onContactPreferenceChange('email')" from the template view
+      <!-- we can remove (click)="onContactPreferenceChange('email')" from the template view
           and add in the component because it will be complex to unit test.
           We can do so in component by subscribinh the changes whenever this control is changes.
           like --  this.empployeeform.get('contactpreference').valueChanges.subscribe()-->
-        <div class="form-group">
-          <label class="col-md-2 control-label">Contact Preference</label>
-          <div class="col-md-8" style="display: inline-flex;">
-            <label class="radio-inline">
-              <input type="radio" value="email" formControlName="contactpreference" (click)="onContactPreferenceChange('email')">Email
-            </label> &nbsp;&nbsp;
-            <label class="radio-inline">
-              <input  type="radio" value="phone" formControlName="contactpreference" (click)="onContactPreferenceChange('phone')">Phone
-            </label>&nbsp;&nbsp;
-          </div>
+      <div class="form-group">
+        <label class="col-md-2 control-label">Contact Preference</label>
+        <div class="col-md-8" style="display: inline-flex;">
+          <label class="radio-inline">
+            <input type="radio" value="email" formControlName="contactpreference"
+              (click)="onContactPreferenceChange('email')">Email
+          </label> &nbsp;&nbsp;
+          <label class="radio-inline">
+            <input type="radio" value="phone" formControlName="contactpreference"
+              (click)="onContactPreferenceChange('phone')">Phone
+          </label>&nbsp;&nbsp;
         </div>
-  
+      </div>
+
+      <div formGroupName="emailGroup">
         <div class="form-group">
           <label class="col-sm-2 control-label" for="email">Email</label>
           <div class="col-sm-8">
             <input id="email" type="text" class="form-control" formControlName="email" placeholder="Email"
-            (blur)="logValidationErrors()">
-
+              (blur)="logValidationErrors()">
             <span class="text-danger" *ngIf="formErrors.email"> {{ formErrors.email }} </span>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="col-sm-2 control-label" for="phone">Phone</label>
+          <label class="col-sm-2 control-label" for="email">Confirm Email</label>
           <div class="col-sm-8">
-            <input id="phone" type="text" class="form-control" formControlName="phone" placeholder="Phone"
+            <input id="confirmEmail" type="text" class="form-control" formControlName="confirmEmail"
+              placeholder="Confirm Email" (blur)="logValidationErrors()">
+            <span class="text-danger" *ngIf="formErrors.confirmEmail || formErrors.emailGroup"> 
+              <!-- checking so that the we dont display multiple invalid validation messages -->
+              {{ formErrors.confirmEmail ? formErrors.confirmEmail : formErrors.emailGroup }}
+              {{ formErrors.emailGroup }}
+             </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="phone">Phone</label>
+        <div class="col-sm-8">
+          <input id="phone" type="text" class="form-control" formControlName="phone" placeholder="Phone"
             (blur)="logValidationErrors()">
 
-            <span class="text-danger" *ngIf="formErrors.phone"> {{ formErrors.phone }} </span>
+          <span class="text-danger" *ngIf="formErrors.phone"> {{ formErrors.phone }} </span>
+        </div>
+      </div>
+
+      <!-- nested form group -->
+      <!-- "skills" -- should matche with nested form group name in component -->
+      <!-- skillName, experienceInYears ---  should matche with nested form control name in component -->
+      <div formGroupName="skills">
+        <div class="form-group">
+          <label class="col-sm-2 control-label" for="skillName">
+            Skill
+          </label>
+          <div class="col-sm-6" style="display: inline-flex;">
+            <input type="text" class="form-control" id="skillName" placeholder="c#,java,angular,mvc,.."
+              formControlName="skillName"> &nbsp;&nbsp;
+
+            <input type="text" placeholder="Experience in Years" class="form-control"
+              formControlName="experienceInYears">
           </div>
+          <div class="col-sm-4"></div>
         </div>
 
-        <!-- nested form group -->
-        <!-- "skills" -- should matche with nested form group name in component -->
-        <!-- skillName, experienceInYears ---  should matche with nested form control name in component -->
-        <div formGroupName="skills">
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="skillName">
-              Skill
+        <div class="form-group">
+          <label class="col-md-2 control-label">Proficiency</label>
+          <div class="col-md-8" style="display: inline-flex;">
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="beginner" formControlName="proficiency">Beginner
+            </label> &nbsp;&nbsp;
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="intermediate" formControlName="proficiency">Intermediate
+            </label>&nbsp;&nbsp;
+            <label class="radio-inline">
+              <input id="proficiency" type="radio" value="advanced" formControlName="proficiency">Advanced
             </label>
-            <div class="col-sm-6" style="display: inline-flex;">
-              <input type="text" class="form-control" id="skillName"
-                  placeholder="c#,java,angular,mvc,.." formControlName="skillName"> &nbsp;&nbsp;
-
-                  <input type="text" placeholder="Experience in Years"
-                  class="form-control" formControlName="experienceInYears">
-            </div>
-            <div class="col-sm-4" ></div>
           </div>
-        
-          <div class="form-group">
-            <label class="col-md-2 control-label">Proficiency</label>
-            <div class="col-md-8" style="display: inline-flex;">
-              <label class="radio-inline">
-                <input id="proficiency" type="radio" value="beginner"
-                       formControlName="proficiency">Beginner
-              </label> &nbsp;&nbsp;
-              <label class="radio-inline">
-                <input id="proficiency" type="radio" value="intermediate"
-                       formControlName="proficiency">Intermediate
-              </label>&nbsp;&nbsp;
-              <label class="radio-inline">
-                <input id="proficiency" type="radio" value="advanced"
-                       formControlName="proficiency">Advanced
-              </label>
-            </div>
-          </div>
-        
         </div>
-  
-      </div>
-      <div class="panel-footer" style="margin-left:15px;">
-        <button class="btn btn-success" type="submit" (click)="saveData()">Save</button>&nbsp;&nbsp;
-        <button class="btn btn-primary" type="button" (click)="loadData()">Load Data</button>&nbsp;&nbsp;
-        <button class="btn btn-primary" type="button" (click)="updateData()">Update Data</button>
-      </div>
-    </div>
-  </form>
 
-  <br>
+      </div>
+
+    </div>
+    <div class="panel-footer" style="margin-left:15px;">
+      <button class="btn btn-success" type="submit" (click)="saveData()">Save</button>&nbsp;&nbsp;
+      <button class="btn btn-primary" type="button" (click)="loadData()">Load Data</button>&nbsp;&nbsp;
+      <button class="btn btn-primary" type="button" (click)="updateData()">Update Data</button>
+      <button class="btn btn-default" type="button" (click)="getAllFormControlsAndGroups()">GetAll</button>
+    </div>
+  </div>
+</form>
+
+<br>
 Form Value : {{ employeeForm.value | json }}

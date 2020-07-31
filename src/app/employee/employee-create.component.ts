@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 // Validators -- for validations
 // FormBuilder -- for "Angular Formbuilder" - code
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormArray, FormControl } from '@angular/forms';
 import { CustomValidators } from '../shared/custom.validators';
 
 @Component({
@@ -25,6 +25,8 @@ export class EmployeeCreateComponent implements OnInit {
     fullName: '',
     phone: '',
     email: '',
+    confirmEmail: '',
+    emailGroup: '',
     skillName: '',
     experienceInYears: '',
     proficiency: ''
@@ -42,6 +44,14 @@ export class EmployeeCreateComponent implements OnInit {
     email: {
       required: 'Email is required.',
       emailDomain: 'Email domain should be angular.com.'  // "emailDomain" - the key returing from custom validation
+    },
+    confirmEmail: {
+      required: 'Confirm Email is required.'
+    },
+    // emailMismatch -- value returing from custom validation,
+    // so the error messages are tied to this and so we created "emailGroup"  to hold the error messages.
+    emailGroup: {
+      emailMismatch: 'Email and Confirm Email dont match.'
     },
     phone: {
       required: 'Phone is required.',
@@ -92,7 +102,13 @@ export class EmployeeCreateComponent implements OnInit {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactpreference: ['email'],
-      email: ['', [Validators.required, CustomValidators.validateEmailDomain('angular.com')]], // custom validation -- "validatEmailDomain"
+      // grouping emails, so that email and confirm eamil can be validated
+      // as we can validate only on control with "Validators", so we created a form group to validate multiple controls
+      emailGroup: this.fb.group({
+        // custom validation -- "validatEmailDomain"
+        email: ['', [Validators.required, CustomValidators.validateEmailDomain('angular.com')]],
+        confirmEmail: ['', [Validators.required]],
+      }, { validator: validateMatchEmails }), // validator-- can be any(its just a key).validateMatchEmails-- custom func.
       phone: [''],
       skills: this.fb.group({
         skillName: ['', Validators.required],
@@ -164,22 +180,22 @@ export class EmployeeCreateComponent implements OnInit {
     Object.keys(grp.controls).forEach((key: string) => {
 
       const abstractControl = grp.get(key);
+      this.formErrors[key] = ' ';
+      if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)) {
+        const msg = this.validationMessages[key];
+
+        for (const errorKey in abstractControl.errors) {
+          if (errorKey) {
+            this.formErrors[key] += msg[errorKey] + ' ';
+          }
+        }
+      }
+
       if (abstractControl instanceof FormGroup) {
         this.logValidationErrors(abstractControl);
       }
       else {
-        // tslint:disable-next-line: no-debugger
-        debugger;
-        this.formErrors[key] = ' ';
-        if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)) {
-          const msg = this.validationMessages[key];
 
-          for (const errorKey in abstractControl.errors) {
-            if (errorKey) {
-              this.formErrors[key] += msg[errorKey] + ' ';
-            }
-          }
-        }
       }
     });
   }
@@ -212,6 +228,64 @@ export class EmployeeCreateComponent implements OnInit {
     });
   }
 
+  // "FormArray" -- just like FormControl and FormGroup, its a collection of formcontrol, formgroup and also formarray
+  // as you can see in the following example.
+  getAllFormControlsAndGroups(): void {
+
+    // creating "FormArray" with "new" -  keyword
+    // const formArray = new FormArray([
+    //   new FormControl('Test', Validators.required),
+    //   new FormGroup({
+    //     country: new FormControl('', Validators.required)
+    //   }),
+    //   new FormArray([])
+    // ]);
+
+
+    // another way of creating "FormArray" is suing "array()" of the FormBuilder - class
+    // we add any type of control to "FormArray"
+    // we can also push,insert into "FormArray"
+    // we also have removeAt(), setControl(),at() methods too
+    const formArray = this.fb.array([
+      new FormControl('TestA', Validators.required),
+      new FormGroup({
+        country: new FormControl('', Validators.required)
+      }),
+      new FormArray([])
+    ]);
+
+
+    // formArray and formArray1 -- are identical in many ways
+    // byt the one major diff is - formArray returns data in array while formArray1 in object form
+    // here when i say formArray is (this.fb.array) and formArray1 is (this.fb.group)
+
+    const formArray2 = this.fb.group([
+      new FormControl('TestA', Validators.required),
+      new FormGroup({
+        country: new FormControl('', Validators.required)
+      }),
+      new FormArray([])
+    ]);
+
+    // example of push() method in "FormArray"
+    formArray.push(new FormControl('TestB', Validators.required));
+
+    console.log(formArray.value);
+
+// looping through FormArray to find if the type (FormControl, FormGroup, FormArray) of control
+    for (const ctrl of formArray.controls) {
+      if (ctrl instanceof FormControl) {
+        console.log('Its FormControl:', ctrl.value);
+      }
+      if (ctrl instanceof FormGroup) {
+        console.log('Its FormGroup:', ctrl.value);
+      }
+      if (ctrl instanceof FormArray) {
+        console.log('Its FormArray:', ctrl.value);
+      }
+    }
+  }
+
   saveData(): void {
     // this.logKeyValueFormGroupPairs(this.employeeForm);
     // this.logValidationErrors(this.employeeForm);
@@ -231,5 +305,21 @@ export class EmployeeCreateComponent implements OnInit {
     }
 
     phoneControl.updateValueAndValidity(); // to update the dynamically set/clear validations
+  }
+}
+
+
+// function to check if email and confirm email are matching
+// the type of this method is "group: AbstractControl" -- becase we are validating multiple controls withing a formr group
+function validateMatchEmails(group: AbstractControl): { [key: string]: any } | null {
+
+  const emailControl = group.get('email');
+  const confirmEmailControl = group.get('confirmEmail');
+  if (emailControl.value === confirmEmailControl.value || confirmEmailControl.pristine) // confirmEmailControl.pristine)-- not touched
+  {
+    return null;
+  }
+  else {
+    return { emailMismatch: true };
   }
 }
