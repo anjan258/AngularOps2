@@ -92,7 +92,7 @@ export class EmployeeCreateComponent implements OnInit {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactpreference: ['email'],
-      email: ['', [Validators.required, CustomValidators.validatEmailDomain('angular.com')]], // custom validation -- "validatEmailDomain"
+      email: ['', [Validators.required, CustomValidators.validateEmailDomain('angular.com')]], // custom validation -- "validatEmailDomain"
       phone: [''],
       skills: this.fb.group({
         skillName: ['', Validators.required],

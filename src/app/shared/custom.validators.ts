@@ -7,7 +7,7 @@ export class CustomValidators {
 
     // created a generic custom validator so that email can removed as hard coded and can be passed from calling function
     // so here we are calling a function inside a function and now "emailArg" will be passed as paramenter to  validate email domain.
-    static validatEmailDomain(emailArg: string): { [key: string]: any } | null {
+    static validateEmailDomain(emailArg: string): { [key: string]: any } | null {
     return (control: AbstractControl): { [key: string]: any } | null => {
 
       const email: string = control.value;
