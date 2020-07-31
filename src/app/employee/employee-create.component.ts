@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 // Validators -- for validations
 // FormBuilder -- for "Angular Formbuilder" - code
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { CustomValidators } from '../shared/custom.validators';
 
 @Component({
   selector: 'app-employee-create',
@@ -91,7 +92,7 @@ export class EmployeeCreateComponent implements OnInit {
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactpreference: ['email'],
-      email: ['', [Validators.required, validatEmailDomain]], // custom validation -- "validatEmailDomain"
+      email: ['', [Validators.required, CustomValidators.validatEmailDomain('angular.com')]], // custom validation -- "validatEmailDomain"
       phone: [''],
       skills: this.fb.group({
         skillName: ['', Validators.required],
@@ -232,18 +233,3 @@ export class EmployeeCreateComponent implements OnInit {
     phoneControl.updateValueAndValidity(); // to update the dynamically set/clear validations
   }
 }
-
-  // custom validation function to validate email domain
-  // if domain matches retun null or error and so the return type is -- { [key: string]: any } | null
-function validatEmailDomain(control: AbstractControl): { [key: string]: any } | null {
-
-    const email: string = control.value;
-    const domain = email.substring(email.lastIndexOf('@') + 1);
-    // email === '' || so that email required error message doesnot show on domain validation
-    if (email === '' || domain.toLocaleLowerCase() === 'angular.com') {
-      return null;
-    }
-    else {
-      return { emailDomain: true }; // returning some string and true to indicate that the validation failed
-    }
-  }
