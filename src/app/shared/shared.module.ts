@@ -8,12 +8,14 @@ import { ReactiveFormsModule  } from '@angular/forms';
 // we may end up creating mutiple instances of services which breaks the rule if angulars singleton service
 // here we cannot import/export that have providers.
 @NgModule({
+
+  // here we specify any components/pipes/directives that needs to be shared with other feature modules
   declarations: [],
   // we can import "CommonModule" - module, if we have any other components/modules dependent on this
   imports: [],
   // as it is needed in employee.module.ts
   // so we can re-export these modules withot being imported
   // we exported these modules as they are used in employee.module.ts
-  exports: [CommonModule, ReactiveFormsModule] 
+  exports: [CommonModule, ReactiveFormsModule]
 })
 export class SharedModule { }

@@ -293,7 +293,7 @@ export class EmployeeCreateComponent implements OnInit {
     if (this.employee.id)
     {
       this.empService.updateEmployee(this.employee).subscribe(
-        () => this.router.navigate(['/list']),
+        () => this.router.navigate(['/employees']),
         (err) => console.log(err)
       );
     }
@@ -302,7 +302,7 @@ export class EmployeeCreateComponent implements OnInit {
       // tslint:disable-next-line: no-debugger
       debugger;
       this.empService.addEmployee(this.employee).subscribe(
-        () => this.router.navigate(['/list']),
+        () => this.router.navigate(['/employees']),
         (err) => console.log(err)
       );
     }

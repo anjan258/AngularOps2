@@ -24,7 +24,7 @@ export class ListEmployeesComponent implements OnInit {
   }
 
   editEmployee(empId: number): void{
-    this.router.navigate(['/edit', empId]);
+    this.router.navigate(['/employees/edit', empId]);
   }
 
 }
