@@ -3,6 +3,12 @@ import { Component, OnInit } from '@angular/core';
 // FormBuilder -- for "Angular Formbuilder" - code
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormArray, FormControl } from '@angular/forms';
 import { CustomValidators } from '../shared/custom.validators';
+import { ActivatedRoute } from '@angular/router';
+import { IEmployee } from './iemployee';
+import { ISkill } from '../employee/iskill';
+import { EmployeeService } from '../services/employee.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-employee-create',
@@ -18,6 +24,8 @@ export class EmployeeCreateComponent implements OnInit {
 
   employeeForm: FormGroup;
   fullNameLength: number;
+  employee: IEmployee;
+  pageTitle: string;
 
 
   // holds the error message for form controls if any errors.
@@ -69,7 +77,8 @@ export class EmployeeCreateComponent implements OnInit {
   };
 
   // creating instance of FormBuilder for "Angular Formbuilder" - code
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private activatedRoute: ActivatedRoute,
+              private empService: EmployeeService, private router: Router) { }
 
   ngOnInit(): void {
 
@@ -101,7 +110,7 @@ export class EmployeeCreateComponent implements OnInit {
 
     this.employeeForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
-      contactpreference: ['email'],
+      contactPreference: ['email'],
       // grouping emails, so that email and confirm eamil can be validated
       // as we can validate only on control with "Validators", so we created a form group to validate multiple controls
       emailGroup: this.fb.group({
@@ -110,12 +119,10 @@ export class EmployeeCreateComponent implements OnInit {
         confirmEmail: ['', [Validators.required]],
       }, { validator: validateMatchEmails }), // validator-- can be any(its just a key).validateMatchEmails-- custom func.
       phone: [''],
-      skills: this.fb.group({
-        skillName: ['', Validators.required],
-        experienceInYears: ['', Validators.required],
-        proficiency: ['', Validators.required]
-      })
+      skills: this.fb.array([ this.addSkillFormGroup()])
     });
+
+
 
 
     // to subscribe/track the changes of any form control
@@ -138,9 +145,77 @@ export class EmployeeCreateComponent implements OnInit {
 
     // to track the changes of "ContactPreference" - radio button instead ow writing click event in template
     // we write as follows
-    this.employeeForm.get('contactpreference').valueChanges.subscribe((data: string) => {
+    this.employeeForm.get('contactPreference').valueChanges.subscribe((data: string) => {
       this.onContactPreferenceChange(data);
     });
+
+    // reading 'id' from url, we use "activatedRoute" and subscribe
+    // so to create and edit we are using same template,
+    // so whenever some one click on edit, it comes to create(this) component and we ready passed param as below
+    this.activatedRoute.paramMap.subscribe(params => {
+        const empId = +params.get('id');
+        if (empId){
+          // edit from
+          this.pageTitle = 'Edit Employee';
+          this.getEmployee(empId);
+        }
+        else{
+          // create from becoz empId is null from URL
+          this.pageTitle = 'Create Employee';
+          this.employee = {
+            id: null,
+            fullName: '',
+            contactPreference: '',
+            email: '',
+            phone: null,
+            skills: []
+          };
+        }
+    });
+  }
+
+  getEmployee(id: number): void{
+   this.empService.getEmployeeById(id).subscribe((data) =>
+   {
+      this.editEmployee(data);
+      this.employee = data;
+   },
+    (err) => console.log(err)
+   );
+  }
+
+  // so here to populate the value in edit page we use "patchValue";
+  editEmployee(emp: IEmployee): void{
+    this.employeeForm.patchValue({
+      fullName: emp.fullName,
+      contactPreference: emp.contactPreference,
+      emailGroup: {
+        email: emp.email,
+        confirmEmail: emp.email
+      },
+      phone: emp.phone
+    });
+
+    // to populate "skills" (becoz this is of type formarray) we use "setControl" instead of "patchValue"
+
+    this.employeeForm.setControl('skills', this.setSkillsForArray(emp.skills));
+  }
+
+  // since FormArray is any array of formgroups and formgroups is an array of formcontrols
+  // so, we create a new formarray and create a forgroup and then add skills formcontrols as below
+  // basically we need to create a formarray for skills
+  // when we update the form programatically then the form validations like (touched, invalid,pristine) doesnt work
+  setSkillsForArray(skillsSet: ISkill[]): FormArray{
+      const formArray = new FormArray([]);
+      skillsSet.forEach(s => {
+      formArray.push(this.fb.group({
+          skillName: s.skillName,
+          experienceInYears: s.experienceInYears,
+          proficiency: s.proficiency
+        })
+      );
+      });
+      return formArray;
   }
 
   // loop through all the form controls in form group
@@ -181,7 +256,8 @@ export class EmployeeCreateComponent implements OnInit {
 
       const abstractControl = grp.get(key);
       this.formErrors[key] = ' ';
-      if (abstractControl && !abstractControl.valid && (abstractControl.touched || abstractControl.dirty)) {
+      if (abstractControl && !abstractControl.valid &&
+         (abstractControl.touched || abstractControl.dirty || abstractControl.value !== '')) {
         const msg = this.validationMessages[key];
 
         for (const errorKey in abstractControl.errors) {
@@ -194,14 +270,54 @@ export class EmployeeCreateComponent implements OnInit {
       if (abstractControl instanceof FormGroup) {
         this.logValidationErrors(abstractControl);
       }
-      else {
 
+      // looping through FormArray controls as we are dynamically adding skills to the formgroup
+      // so that we can loop through formarray and find controls/formgroup for validations
+      if (abstractControl instanceof FormArray) {
+        for (const ctrl of abstractControl.controls)
+        {
+          if (ctrl instanceof FormGroup)
+          {
+            this.logValidationErrors(ctrl);
+          }
+        }
       }
     });
   }
 
   onFormSubmit(): void {
-    console.log(this.employeeForm.value);
+    // console.log(this.employeeForm.value);
+    this.mapEditModel();
+    // if employee id exists the call edit service
+    // else create service
+    if (this.employee.id)
+    {
+      this.empService.updateEmployee(this.employee).subscribe(
+        () => this.router.navigate(['/list']),
+        (err) => console.log(err)
+      );
+    }
+    else{
+
+      // tslint:disable-next-line: no-debugger
+      debugger;
+      this.empService.addEmployee(this.employee).subscribe(
+        () => this.router.navigate(['/list']),
+        (err) => console.log(err)
+      );
+    }
+
+  }
+
+  // so , here we are updating the updated values from edit from and binding the initial loaded values.
+  // so when we load this page, we have store employee deatils in this.employee
+  // and now after form is edited, the values might change, so we assign those value to -- this.employee
+  mapEditModel(): void{
+    this.employee.fullName = this.employeeForm.value.fullName;
+    this.employee.email = this.employeeForm.value.emailGroup.email;
+    this.employee.phone = this.employeeForm.value.phone;
+    this.employee.contactPreference = this.employeeForm.value.contactPreference;
+    this.employee.skills = this.employeeForm.value.skills;
   }
 
   // setValue()-- used to bind/populate values to the form controls (fields)
@@ -226,6 +342,31 @@ export class EmployeeCreateComponent implements OnInit {
       fullName: 'Sara',
       email: 'sara@test.com'
     });
+  }
+
+
+  addSkillFormGroup(): FormGroup{
+    return  this.fb.group({
+      skillName: ['', Validators.required],
+      experienceInYears: ['', Validators.required],
+      proficiency: ['', Validators.required]
+    });
+  }
+
+  removeSkill(index: number): void{
+    const skillsFormArray = (this.employeeForm.get('skills') as FormArray);
+    (skillsFormArray).removeAt(index);
+    // marking as touched/dirty becoz when we programatically remove/add controls, these validations doesnt work
+    skillsFormArray.markAsDirty();
+    skillsFormArray.markAllAsTouched();
+  }
+
+  // dynamically adding formgroup
+  // so this method will add 'skills' formcontrols to the skills form group and we can loop thorugh in template
+  addSkillButton(): void{
+    // casting to FormArray-- as we need to push new form group(skill - group)
+    // so only FormArray has push methos, we have type casted.
+        (this.employeeForm.get('skills') as FormArray).push(this.addSkillFormGroup());
   }
 
   // "FormArray" -- just like FormControl and FormGroup, its a collection of formcontrol, formgroup and also formarray
@@ -315,7 +456,8 @@ function validateMatchEmails(group: AbstractControl): { [key: string]: any } | n
 
   const emailControl = group.get('email');
   const confirmEmailControl = group.get('confirmEmail');
-  if (emailControl.value === confirmEmailControl.value || confirmEmailControl.pristine) // confirmEmailControl.pristine)-- not touched
+  if (emailControl.value === confirmEmailControl.value
+    || (confirmEmailControl.pristine && confirmEmailControl.value === '')) // confirmEmailControl.pristine)-- not touched
   {
     return null;
   }

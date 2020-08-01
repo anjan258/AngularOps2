@@ -1,0 +1,93 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "fullName": "TestA",
+      "contactPreference": "email",
+      "email": "testa@test.com",
+      "phone": 1234567890,
+      "skills": [
+        {
+          "skillName": "C#",
+          "experienceInYears": 5,
+          "proficiency": "beginner"
+        },
+        {
+          "skillName": "mvc",
+          "experienceInYears": 8,
+          "proficiency": "intermediate"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "fullName": "Test-B",
+      "email": "testb@angular.com",
+      "phone": "112245900",
+      "skills": [
+        {
+          "skillName": "Java1",
+          "experienceInYears": "1",
+          "proficiency": "intermediate"
+        }
+      ],
+      "contactPreference": "email"
+    },
+    {
+      "id": 3,
+      "fullName": "TestC",
+      "contactPreference": "email",
+      "email": "testC@test.com",
+      "phone": 1234567890,
+      "skills": [
+        {
+          "skillName": "angular",
+          "experienceInYears": 3,
+          "proficiency": "beginner"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "fullName": "TestD",
+      "contactPreference": "phone",
+      "email": "testd@test.com",
+      "phone": 1234567890,
+      "skills": [
+        {
+          "skillName": "sql",
+          "experienceInYears": 8,
+          "proficiency": "beginner"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "fullName": "Test-G1",
+      "contactPreference": "phone",
+      "email": "testg@angular.com",
+      "phone": "534534534",
+      "skills": [
+        {
+          "skillName": "a",
+          "experienceInYears": "2",
+          "proficiency": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "fullName": "",
+      "contactPreference": "email",
+      "email": "",
+      "phone": "",
+      "skills": [
+        {
+          "skillName": "",
+          "experienceInYears": "",
+          "proficiency": ""
+        }
+      ]
+    }
+  ]
+}
