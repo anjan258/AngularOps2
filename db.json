@@ -88,6 +88,20 @@
           "proficiency": ""
         }
       ]
+    },
+    {
+      "id": 7,
+      "fullName": "",
+      "contactPreference": "email",
+      "email": "",
+      "phone": "",
+      "skills": [
+        {
+          "skillName": "",
+          "experienceInYears": "",
+          "proficiency": ""
+        }
+      ]
     }
   ]
 }
