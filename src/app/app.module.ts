@@ -18,11 +18,16 @@ import { PageNotFoundComponent } from './page-not-found.component';
     HomeComponent,
     PageNotFoundComponent
   ],
+  // the order of registering the modules should be in order
+  // in other words, since now we have separated EmployeeModule, which has seperated routing module(employee-routing.module)
+  // we need register EmployeeModule first and then AppRoutingModule, because we have sepcifice routes first ,
+  // so when we navigate through links, it matches the routes and redirects the users to appropriate page,
+  // but if we register AppRoutingModule module first , it has patter matching(wild card) routes, so it will always show page not found
   imports: [
     BrowserModule,
-    AppRoutingModule,
     HttpClientModule,
-    EmployeeModule
+    EmployeeModule,
+    AppRoutingModule,
   ],
   providers: [EmployeeService],
   bootstrap: [AppComponent]

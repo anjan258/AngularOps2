@@ -4,6 +4,7 @@ import { EmployeeCreateComponent } from './employee-create.component';
 import { ListEmployeesComponent } from './list-employees.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { EmployeeRoutingModule  } from './employee-routing.module';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    EmployeeRoutingModule
   ],
   // as the components of employee are moved to employee-module
   // so there will be accessible in the employee module,
