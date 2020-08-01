@@ -6,6 +6,8 @@ import { EmployeeRoutingModule  } from './employee-routing.module';
 import { SharedModule } from '../shared/shared.module';
 
 
+// to make this module (or any),"Lazy loaded" we should make sure that the mdoule is not referenced in any other module
+// and also the route prefix of all the url in the module should be same.
 @NgModule({
   declarations: [
     EmployeeCreateComponent,

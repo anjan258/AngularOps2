@@ -9,16 +9,24 @@ import { ListEmployeesComponent } from './list-employees.component';
 // so now the urls will be employees, employees/create and employees/create/2
 // also we need to change the routerlink in the app.component.html as (routerLink="employees", routerLink="employees/create")
 
- //    { path: 'employees', children: [ -- called as component-less route, as it have no components attached
- // and it has children with common url prefix(called 'employees') with different components
+//    { path: 'employees', children: [ -- called as component-less route, as it have no components attached
+// and it has children with common url prefix(called 'employees') with different components
+
+// to make this module (or any),"Lazy loaded" we should make sure that the mdoule is not referenced in any other module
+// and also the route prefix of all the url in the module should be same.
+
+
+//  { path: 'employees', children: -- [commented becoz we implemented LAZY loading 
+// and we are specifying the employeee prefix in app-routing
 const routes: Routes = [
-    { path: 'employees', children: [
+    // { path: 'employees', children: [
 
         { path: '', component: ListEmployeesComponent },
         { path: 'create', component: EmployeeCreateComponent },
         { path: 'edit/:id', component: EmployeeCreateComponent }
-    ]}
 ];
+
+
 
 // we should use only "forChild()" -- in feature modules (like this module)
 // we cant use "forRoot" here to bind routes except in root module routing
