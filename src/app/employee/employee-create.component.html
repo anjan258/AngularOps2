@@ -107,7 +107,7 @@
       add dynamically to skills-group -->
       <!-- let i = index -- to loop through each skills - group with unique group id -->
        <div class="well">
-      <div formArrayName="skills" *ngFor="let skill of employeeForm.get('skills').value; let i = index">
+      <div formArrayName="skills" *ngFor="let skill of employeeForm.controls.skills['controls']; let i = index">
         <div [formGroupName]="i">
           <div class="form-group">
             <label class="col-sm-2 control-label" [attr.for]="'skillName' + i">
